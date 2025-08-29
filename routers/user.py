@@ -18,6 +18,10 @@ def get_db():
     finally:
         db.close()
 
+@router.get('/')
+def home():
+    return {"message": "Welcome to the User API"}
+
 @router.post("/create_user")
 def create_user(user: UserCreate, db: Session = Depends(get_db)):
     # Check if username or email already exists
