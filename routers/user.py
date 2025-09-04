@@ -3,7 +3,7 @@ from fastapi.security import OAuth2PasswordRequestForm
 from pydantic import BaseModel
 from sqlalchemy.orm import Session
 from database import SessionLocal
-from auth_utils import auth_user, create_access_token, get_password_hash
+from auth_utils import auth_user, create_access_token, get_password_hash, get_current_active_user
 from models import User
 
 router = APIRouter()
@@ -71,6 +71,10 @@ def list_users(db: Session = Depends(get_db)):
 class Token(BaseModel):
     access_token: str
     token_type: str
+
+@router.get("/protected", status_code=200)
+def protected(user: User = Depends(get_current_active_user)):
+    return {"message": f"Hello, {user.username}. This is a protected route."}
 
 @router.post("/token", response_model=Token)
 def login(form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(get_db)):

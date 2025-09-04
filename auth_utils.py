@@ -35,7 +35,6 @@ def get_password_hash(password):
 
 def get_user(db, username: str):
     user = db.query(User).filter(User.username == username).first()
-    print(user)
     if user:
         return user
 
@@ -78,9 +77,3 @@ async def get_current_active_user(token: Annotated[str, Depends(oauth2_scheme)])
     if user is None:
         raise HTTPException(status_code=401, detail="Not authenticated")
     return user
-
-def login_required(func: Callable):
-    @wraps(func)
-    async def wrapper(*args, user: User = Depends(get_current_active_user), **kwargs):
-        return await func(*args, user=user, **kwargs)
-    return wrapper

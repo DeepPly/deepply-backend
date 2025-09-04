@@ -29,10 +29,12 @@ def get_db():
 @router.post("/upload_game")
 def upload_game(data: GameUpload, db: Session = Depends(get_db), user: User = Depends(get_current_active_user)):
     is_valid, error_message = validate_pgn(data.pgn)
-    game_analysis_result = game_analysis(data.pgn)
+    
 
     if not is_valid:
         raise HTTPException(status_code=400, detail=error_message) 
+    
+    game_analysis_result = game_analysis(data.pgn)
     
     new_game = Game(
         user_id=user.id, 

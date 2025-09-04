@@ -11,12 +11,17 @@
     <br><br>
     <button type="submit">Create User</button>
 </form>
-
+<form id="loginForm">
+    <label for="loginUsername">Username:</label>
+    <input type="text" id="loginUsername" name="username" required>
+    <br><br>
+    <label for="loginPassword">Password:</label>
+    <input type="password" id="loginPassword" name="password" minlength="8" required>
+    <br><br>
+    <button type="submit">Login</button>
+</form>
 <h1>Upload Game</h1>
 <form id="uploadGameForm">
-    <label for="user_id">User ID:</label>
-    <input type="number" id="user_id" name="user_id" required>
-    <br><br>
     <label for="user_color">User Color (true=White, false=Black):</label>
     <select id="user_color" name="user_color" required>
         <option value="true">White</option>
@@ -48,7 +53,6 @@
 document.getElementById('uploadGameForm').addEventListener('submit', async function(e) {
     e.preventDefault();
     const data = {
-        user_id: parseInt(document.getElementById('user_id').value),
         user_color: document.getElementById('user_color').value === "true",
         pgn: document.getElementById('pgn').value,
         time_control: document.getElementById('time_control').value,
@@ -59,12 +63,31 @@ document.getElementById('uploadGameForm').addEventListener('submit', async funct
     };
     const response = await fetch('http://127.0.0.1:8000/upload_game', {
         method: 'POST',
-        headers: {'Content-Type': 'application/json'},
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${localStorage.getItem('access_token')}`
+        },
         body: JSON.stringify(data)
     });
     const result = await response.json();
-    alert(JSON.stringify(result));
+    console.log(result);
 });
+
+document.getElementById('loginForm').addEventListener('submit', async function(e) {
+    e.preventDefault();
+    const data = {
+        username: document.getElementById('loginUsername').value,
+        password: document.getElementById('loginPassword').value
+    }
+    fetch('http://127.0.0.1:8000/token', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+        body: new URLSearchParams(data)
+    }).then(response => response.json()).then(data => {
+        console.log(data);
+        localStorage.setItem('access_token', data.access_token);
+    });
+})
 
 document.getElementById('createUserForm').addEventListener('submit', async function(e) {
     e.preventDefault();
@@ -81,4 +104,31 @@ document.getElementById('createUserForm').addEventListener('submit', async funct
     const result = await response.json();
     alert(JSON.stringify(result));
 });
+
+
+function protected(){
+    if (localStorage.getItem('access_token')) {
+        let good = false;
+        fetch('http://127.0.0.1:8000/protected', {
+            headers: {'Authorization': `Bearer ${localStorage.getItem('access_token')}`}
+        })
+        .then(data => {
+            if (data.status === 401) {
+                alert("Unauthorized");
+            } else {
+                good = true;
+                return data.json();
+            }
+        }).then(data => {
+            if (good) {
+                alert(JSON.stringify(data));
+            }
+        }).catch(err => {
+            console.error(err);
+            alert("Error accessing protected route");
+        });
+    } else{
+        alert("No access token")
+    }
+}
 </script>
