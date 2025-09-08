@@ -19,6 +19,11 @@ class UserInDB(BaseModel):
     email: str
     disabled: bool
 
+class RegisterResponse(BaseModel):
+    user: UserInDB
+    access_token: str
+    token_type: str
+
 def get_db():
     db = SessionLocal()
     try:
@@ -48,12 +53,18 @@ def create_user(user: UserCreate, db: Session = Depends(get_db)):
     db.add(new_user)
     db.commit()
     db.refresh(new_user)
-    return UserInDB(
-        id=new_user.id,
-        username=new_user.username,
-        email=new_user.email,
-        disabled=new_user.disabled
-    )
+    access_token = create_access_token(data={"sub": user.username})
+    return {
+        "user": UserInDB(
+            id=new_user.id,
+            username=new_user.username,
+            email=new_user.email,
+            disabled=new_user.disabled
+        ),
+        "access_token": access_token,
+        "token_type": "bearer"
+    }
+
 
 @router.get("/users/{user_id}")
 def get_user(user_id: int, db: Session = Depends(get_db)):

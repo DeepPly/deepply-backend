@@ -1,4 +1,4 @@
-from fastapi import FastAPI, Depends, HTTPException, status
+from fastapi import FastAPI
 from typing import Annotated
 from pydantic import BaseModel
 from routers import upload, user

@@ -11,13 +11,13 @@ router = APIRouter(
 )
 
 class GameUpload(BaseModel):
-    user_color: bool
+    user_color: bool = 0
     pgn: str
-    time_control: str
-    game_type: str
-    description: str = ""
+    time_control: str = 'rapid'
+    game_type: str = 'otb'
+    description: str = ''
     opponent_rating: int | None = None
-    result: str
+    result: str = "1/2-1/2"
 
 def get_db():
     db = SessionLocal()
@@ -26,7 +26,7 @@ def get_db():
     finally:
         db.close()    
 
-@router.post("/upload_game")
+@router.post("/review")
 def upload_game(data: GameUpload, db: Session = Depends(get_db), user: User = Depends(get_current_active_user)):
     is_valid, error_message = validate_pgn(data.pgn)
     
