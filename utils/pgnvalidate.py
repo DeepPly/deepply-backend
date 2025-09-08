@@ -89,8 +89,8 @@ def game_analysis(pgn: str) -> dict:
         if is_top_move:
             if second_best is not None:
                 if second_best['Mate'] is not None:
-                    evals[i] - second_best['evaluation'] >= abs(evals[i])
-                great_moves.append((i % 2, evals[i], moves_san[i]))
+                    if evals[i] - second_best['evaluation'] >= abs(evals[i]):
+                        great_moves.append((i % 2, evals[i], moves_san[i]))
 
 
     eval_copy = copy.deepcopy(evals)
