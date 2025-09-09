@@ -1,9 +1,11 @@
 from concurrent.futures import ProcessPoolExecutor
 import copy
 import chess.pgn
-from chess import IllegalMoveError, Move
-import io
-from .analyze import analyze_position_worker
+from chess import IllegalMoveError
+import io, os, asyncio
+
+from utils.batchsf import analyse_batch_stockfishlike
+MPV  = int(os.getenv("REVIEW_MULTIPV", "1"))
 
 def validate_pgn(pgn: str) -> tuple[bool, str]:
     """
@@ -37,7 +39,7 @@ def validate_pgn(pgn: str) -> tuple[bool, str]:
         print(f"PGN validation error: {e}")
         return False, str(e)
 
-def game_analysis(pgn: str) -> dict:
+async def game_analysis(pgn: str) -> dict:
     pgn_io = io.StringIO(pgn)
     game = chess.pgn.read_game(pgn_io)
     if game is None or game.errors != []:
@@ -58,7 +60,7 @@ def game_analysis(pgn: str) -> dict:
 
     fens = fens[:40]
     with ProcessPoolExecutor() as executor:
-        evals = list(executor.map(analyze_position_worker, [(fen, 10) for fen in fens]))
+        evals = await analyse_batch_stockfishlike(fens, multipv=MPV)
     
     mistakes = {}
     blunders = {}

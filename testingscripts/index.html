@@ -61,7 +61,7 @@ document.getElementById('uploadGameForm').addEventListener('submit', async funct
         opponent_rating: document.getElementById('opponent_rating').value ? parseInt(document.getElementById('opponent_rating').value) : null,
         result: document.getElementById('result').value
     };
-    const response = await fetch('http://127.0.0.1:8001/upload_game', {
+    const response = await fetch('http://127.0.0.1:8000/review', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
