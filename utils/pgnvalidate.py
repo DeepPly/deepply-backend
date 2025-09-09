@@ -56,8 +56,9 @@ def game_analysis(pgn: str) -> dict:
         if not board.is_game_over():
             fens.append(board.fen())
 
+    fens = fens[:40]
     with ProcessPoolExecutor() as executor:
-        evals = list(executor.map(analyze_position_worker, [(fen, 15) for fen in fens]))
+        evals = list(executor.map(analyze_position_worker, [(fen, 10) for fen in fens]))
     
     mistakes = {}
     blunders = {}
