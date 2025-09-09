@@ -35,7 +35,7 @@ def get_db():
 def home():
     return {"message": "Welcome to the User API"}
 
-@router.post("/create_user", response_model=UserInDB, status_code=201)
+@router.post("/create_user", response_model=RegisterResponse, status_code=201)
 def create_user(user: UserCreate, db: Session = Depends(get_db)):
     # Check if username or email already exists
     if db.query(User).filter(User.username == user.username).first():

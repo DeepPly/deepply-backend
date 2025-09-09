@@ -59,22 +59,22 @@ def game_analysis(pgn: str) -> dict:
     with ProcessPoolExecutor() as executor:
         evals = list(executor.map(analyze_position_worker, [(fen, 15) for fen in fens]))
     
-    mistakes = []
-    blunders = []
-    great_moves = []
+    mistakes = {}
+    blunders = {}
+    great_moves = {}
     for i in range(1, len(evals)):
         diff = None
         if evals[i]['evaluation']['type'] == 'mate':
             if evals[i - 1]['evaluation']['type'] == 'cp':
-                mistakes.append((i, evals[i], evals[i - 1]))
+                mistakes[i] = (evals[i], evals[i - 1])
         elif evals[i]['evaluation']['type'] == 'cp' and evals[i - 1]['evaluation']['type'] == 'cp':
             diff = abs(evals[i]['evaluation']['value'] - evals[i - 1]['evaluation']['value'])
 
         if diff: 
-            if 100 > diff > 50:
-                mistakes.append((i % 2, evals[i - 1], evals[i], moves_san[i]))
-            elif diff >= 100:
-                blunders.append((i % 2, evals[i], evals[i - 1], moves_san[i]))
+            if 150 > diff > 50:
+                mistakes[i] = (evals[i - 1], evals[i], moves_san[i])
+            elif diff >= 150:
+                blunders[i] = (evals[i], evals[i - 1], moves_san[i])
 
         if i == 0: continue
         is_top_move = False
@@ -90,8 +90,8 @@ def game_analysis(pgn: str) -> dict:
         if is_top_move:
             if second_best is not None:
                 if second_best['Mate'] is not None:
-                    if evals[i] - second_best['evaluation'] >= abs(evals[i]):
-                        great_moves.append((i % 2, evals[i], moves_san[i]))
+                    if evals[i] - second_best['evaluation'] >= abs(evals[i]) * 0.85:
+                        great_moves[i] = (evals[i], moves_san[i])
 
 
     eval_copy = copy.deepcopy(evals)
