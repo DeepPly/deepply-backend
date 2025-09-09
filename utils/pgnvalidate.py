@@ -59,8 +59,7 @@ async def game_analysis(pgn: str) -> dict:
             fens.append(board.fen())
 
     fens = fens[:40]
-    with ProcessPoolExecutor() as executor:
-        evals = await analyse_batch_stockfishlike(fens, multipv=MPV)
+    evals = await analyse_batch_stockfishlike(fens, multipv=MPV)
     
     mistakes = {}
     blunders = {}
