@@ -73,9 +73,9 @@ async def game_analysis(pgn: str) -> dict:
             diff = abs(evals[i]['evaluation']['value'] - evals[i - 1]['evaluation']['value'])
 
         if diff: 
-            if 150 > diff > 50:
+            if 200 > diff > 50:
                 mistakes[i] = (evals[i - 1], evals[i], moves_san[i])
-            elif diff >= 150:
+            elif diff >= 200:
                 blunders[i] = (evals[i], evals[i - 1], moves_san[i])
 
         if i == 0: continue

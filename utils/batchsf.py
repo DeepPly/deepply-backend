@@ -8,15 +8,10 @@ import chess.engine
 ENGINE_PATH    = os.getenv("STOCKFISH_PATH", "/usr/games/stockfish")
 SF_THREADS     = int(os.getenv("SF_THREADS", "4"))
 SF_HASH_MB     = int(os.getenv("SF_HASH", "256"))
-PER_POS_MS     = os.getenv("REVIEW_MS_PER_POS")        # e.g. "50"
-PER_POS_NODES  = os.getenv("REVIEW_NODES_PER_POS")     # e.g. "80000"
+PER_POS_MS     = os.getenv("REVIEW_MS_PER_POS", 100)
 
 def _limits() -> chess.engine.Limit:
-    if PER_POS_MS and PER_POS_MS.strip():
-        return chess.engine.Limit(time=int(PER_POS_MS) / 1000.0)
-    if PER_POS_NODES and PER_POS_NODES.strip():
-        return chess.engine.Limit(nodes=int(PER_POS_NODES))
-    return chess.engine.Limit(time=0.05)
+    return chess.engine.Limit(time=int(PER_POS_MS) / 1000.0)
 
 def _pov_to_eval(ps: chess.engine.PovScore, turn: chess.Color) -> Dict[str, Any]:
     """Return {"type": "cp"|"mate", "value": int} from a PovScore, POV = side to move."""
